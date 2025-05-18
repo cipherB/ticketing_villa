@@ -15,7 +15,8 @@ class Events(models.Model):
         choices=EventCategories.choices,
         default=""
     )
-    banner = CloudinaryField('image')
+    banner = CloudinaryField('image', null=True, blank=True)
+    banner_url = models.SlugField(blank=True, null=True)
     event_date = models.DateField()
     event_time = models.TimeField()
     venue_name = models.CharField(max_length=100, blank=True, null=True)
@@ -51,6 +52,7 @@ class Order(models.Model):
     total = models.FloatField()
     payment_status = models.BooleanField(default=False)
     payment_receipt = CloudinaryField('image', blank=True, null=True)
+    payment_receipt_url = models.SlugField(blank=True, null=True)
     paid_at = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
