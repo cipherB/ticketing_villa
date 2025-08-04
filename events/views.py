@@ -88,9 +88,9 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "message": "Tickets purchased", 
                 "data": serializer.data, 
                 "account_details": {
-                    "account_no": "00092949499",
-                    "bank": "WEMA",
-                    "account_name": "JOHN DOE"
+                    "account_no": "2066176772",
+                    "bank": "United Bank of Africa",
+                    "account_name": "Okoroafor Emmanuel"
                 }
             },
             status=status.HTTP_200_OK,
