@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from .models import CartItems, Events, Order, Tickets
 from .serializers import CartItemSerializer, EventSerializer, OrderSerializer, TicketSerializer
+from .utils import send_email_with_pdf, notify_admin_of_purchase
 
 # Create your views here.
 
@@ -67,9 +68,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
         
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        
+        email = serializer.validated_data.get("email_address")
+        full_name = serializer.validated_data.get("full_name")
+        order_id = instance.id
+                
         cart_items_ids = request.data.get('cart_items', [])
         order_items = CartItems.objects.filter(id__in=cart_items_ids).select_related('ticket')
 
@@ -81,6 +87,9 @@ class OrderViewSet(viewsets.ModelViewSet):
             #     )
             ticket.quantity -= item.quantity
             ticket.save()
+            
+        send_email_with_pdf(email, order_id, full_name)
+        notify_admin_of_purchase(email, order_id, full_name)
 
         return Response(
             {
