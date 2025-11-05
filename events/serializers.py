@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.conf import settings
+import cloudinary
 from .models import CartItems, Events, Order, Tickets
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -8,17 +10,22 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'deadline', 'price', 'quantity', 'description']
         
 class EventSerializer(serializers.ModelSerializer):
-    # banner_url = serializers.SerializerMethodField()
+    banner_url = serializers.SerializerMethodField()
     tickets = TicketSerializer(many=True, read_only=True)
     
     class Meta:
         model = Events
         fields = ['id', 'name', 'description', 'category', 'banner_url', 'event_date', 'event_time', 'venue_name', 'address', 'tickets']
     
-    # def get_banner_url(self, obj):
-    #     if obj.banner:
-    #         return obj.banner.url
-    #     return None
+    def get_banner_url(self, obj):
+        if obj.banner:
+            # Complete the Cloudinary URL
+            banner_path = str(obj.banner)
+            if banner_path and not banner_path.startswith('http'):
+                cloud_name = cloudinary.config().cloud_name
+                return f"https://res.cloudinary.com/{cloud_name}/{banner_path}"
+            return banner_path
+        return None
     
 class CartItemSerializer(serializers.ModelSerializer):
     

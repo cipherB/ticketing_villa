@@ -2,9 +2,9 @@ from rest_framework import viewsets, parsers, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from .models import CartItems, Events, Order, Tickets
+from .models import CartItems, Events, Order, Tickets, PurchasedTickets
 from .serializers import CartItemSerializer, EventSerializer, OrderSerializer, TicketSerializer
-from .utils import send_email_with_pdf, notify_admin_of_purchase
+from .utils import send_email_with_purchased_tickets, notify_admin_of_purchase
 
 # Create your views here.
 
@@ -77,18 +77,33 @@ class OrderViewSet(viewsets.ModelViewSet):
         order_id = instance.id
                 
         cart_items_ids = request.data.get('cart_items', [])
-        order_items = CartItems.objects.filter(id__in=cart_items_ids).select_related('ticket')
+        order_items = CartItems.objects.filter(id__in=cart_items_ids).select_related('ticket__event')
 
+        # Create individual purchased tickets for each cart item quantity
+        purchased_tickets = []
+        
         for item in order_items:
             ticket = item.ticket
             # if ticket.quantity < item.quantity:
             #     raise serializers.ValidationError(
             #         f"Not enough tickets available for {ticket.name} (Available: {ticket.quantity}, Requested: {item.quantity})"
             #     )
+            
+            # Reduce ticket inventory
             ticket.quantity -= item.quantity
             ticket.save()
             
-        send_email_with_pdf(email, order_id, full_name)
+            # Create individual purchased tickets for each quantity
+            for _ in range(item.quantity):
+                purchased_ticket = PurchasedTickets.objects.create(
+                    order=instance,
+                    ticket=ticket,
+                    verified=False
+                )
+                purchased_tickets.append(purchased_ticket)
+            
+        # Send email with individual PDFs for each purchased ticket
+        send_email_with_purchased_tickets(email, instance, purchased_tickets)
         notify_admin_of_purchase(email, order_id, full_name)
 
         return Response(

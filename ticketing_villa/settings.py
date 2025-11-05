@@ -89,10 +89,10 @@ WSGI_APPLICATION = 'ticketing_villa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ChingUser$default',
-        'USER': 'ChingUser',
-        'PASSWORD': 'kamaldeen',
-        'HOST': 'ChingUser.mysql.pythonanywhere-services.com',
+        'NAME': 'nostalgia2025$default',
+        'USER': 'nostalgia2025',
+        'PASSWORD': 'wordpass321',
+        'HOST': 'nostalgia2025.mysql.pythonanywhere-services.com',
         'PORT': '3306',
         'OPTIONS': {
             'ssl': True,  # Add this line to enable SSL
