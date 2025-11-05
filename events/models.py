@@ -1,7 +1,13 @@
 from django.db import models
 from cloudinary.models import CloudinaryField
+import string
+import random
 
 # Create your models here.
+
+def generate_unique_cart_id():
+    """Generate a unique 6-character alphanumeric ID for cart items"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 class EventCategories(models.TextChoices):
     BEACH_PARTY = 'BEACH_PARTY', 'BEACH PARTY'
@@ -50,15 +56,21 @@ class Order(models.Model):
     phone_number = models.CharField(max_length=15)
     cart_items = models.ManyToManyField(CartItems)
     total = models.FloatField()
-    payment_status = models.BooleanField(default=False)
+    payment_status = models.BooleanField(default=True)
     payment_receipt = CloudinaryField('image', blank=True, null=True)
     payment_receipt_url = models.URLField(blank=True, null=True)
-    paid_at = models.DateTimeField(null=True)
+    paid_at = models.DateTimeField(null=True, auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"{self.full_name}"
     
-
+class PurchasedTickets(models.Model):
+    unique_id = models.CharField(max_length=6, unique=True, default=generate_unique_cart_id, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='purchased_tickets_order')
+    ticket = models.ForeignKey(Tickets, on_delete=models.CASCADE, related_name='purchased_tickets')
+    verified = models.BooleanField(default=False)
+    
+    
     
