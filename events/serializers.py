@@ -10,14 +10,14 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'deadline', 'price', 'quantity', 'description']
         
 class EventSerializer(serializers.ModelSerializer):
-    banner_url = serializers.SerializerMethodField()
+    banner_link_url = serializers.SerializerMethodField()
     tickets = TicketSerializer(many=True, read_only=True)
     
     class Meta:
         model = Events
-        fields = ['id', 'name', 'description', 'category', 'banner_url', 'event_date', 'event_time', 'venue_name', 'address', 'tickets']
+        fields = ['id', 'name', 'description', 'category', 'banner_url', 'event_date', 'event_time', 'venue_name', 'address', 'tickets', "banner_link_url"]
     
-    def get_banner_url(self, obj):
+    def get_banner_link_url(self, obj):
         if obj.banner:
             # Complete the Cloudinary URL
             banner_path = str(obj.banner)
