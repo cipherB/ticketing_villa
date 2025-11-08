@@ -72,5 +72,8 @@ class PurchasedTickets(models.Model):
     ticket = models.ForeignKey(Tickets, on_delete=models.CASCADE, related_name='purchased_tickets')
     verified = models.BooleanField(default=False)
     
+    def __str__(self):
+        return f"{self.ticket} - #{self.order.id}"
+    
     
     
