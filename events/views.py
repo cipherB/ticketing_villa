@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import CartItems, Events, Order, Tickets, PurchasedTickets
 from .serializers import CartItemSerializer, EventSerializer, OrderSerializer, TicketSerializer
 from .utils import send_email_with_purchased_tickets, notify_admin_of_purchase
+from decouple import config
 
 # Create your views here.
 
