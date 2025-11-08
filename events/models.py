@@ -73,7 +73,7 @@ class PurchasedTickets(models.Model):
     verified = models.BooleanField(default=False)
     
     def __str__(self):
-        return f"{self.ticket} - #{self.order.id}"
+        return f"{self.unique_id} - #{self.order.id}"
     
     
     
